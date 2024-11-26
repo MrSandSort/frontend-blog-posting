@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+*{
+    box-sizing: 0;
+    margin: 0;
+}
+
+.wrapper
+{
+    background-color:rgb(255, 248, 222);
+    height: 400px;
+}
+
+.p-text
+{
+   padding:1rem 2rem;
+   font-family: "Sour Gummy";
+   text-align: justify;
+}
+
+.marx{
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 1.5rem;
+    color:cadetblue;
+    font-weight: bold;
+}
+
+.btn_cs
+{
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+.redirect-btn
+{
+    background-color: #4CAF50;
+    height: 3rem;
+    width: 10rem;
+}
+

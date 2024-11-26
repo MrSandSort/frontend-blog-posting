@@ -1,0 +1,31 @@
+*{
+    margin: 0;
+    box-sizing: 0;
+
+}
+
+
+.Logo
+{
+   padding-left: 1rem;
+}
+
+.navbar{
+    backface-visibility: visible;
+    background-color:rgb(245, 247, 248);
+}
+
+.navList 
+{
+    display: flex;
+    gap: 10px;
+    padding-right: 10rem;
+
+}
+
+.navItems{
+text-decoration: none;
+font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+color: black;
+
+}
