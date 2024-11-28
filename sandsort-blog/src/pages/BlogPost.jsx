@@ -34,11 +34,13 @@ export default function BlogModal() {
     } catch (err) {
       setError(err.response ? err.response.data.detail : 'Failed to post blog');
     }
+
   };
 
   return <>
     
     <NavBar/>
+
     <div style={styles.container}>
 
       <div style={styles.formWrapper}>
@@ -86,6 +88,7 @@ export default function BlogModal() {
 }
 
 const styles = {
+
   container: {
     display: 'flex',
     justifyContent: 'center',
@@ -95,8 +98,8 @@ const styles = {
   },
   formWrapper: {
     width: '100%',
-    maxWidth: '500px',
-    padding: '2rem',
+    maxWidth: '350px',
+    padding: '1rem',
     backgroundColor: '#fff',
     borderRadius: '10px',
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',

@@ -21,10 +21,10 @@ export default function NavBar() {
         <Link to="/" className="navItems">
           Home
         </Link>
-        <Link to="blogs/" className="navItems">
+        <Link to="/blogs" className="navItems">
           Blogs
         </Link>
-        <Link to="" className="navItems">
+        <Link to="/login" className="navItems">
           Login
         </Link>
         <Link href="" className="navItems">
