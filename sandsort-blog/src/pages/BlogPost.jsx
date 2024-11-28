@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import NavBar from '../components/NavBar';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function BlogModal() {
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+
   const [formData, setFormData] = useState({ title: '', content: '' });
+  const navigate= useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -14,81 +17,94 @@ export default function BlogModal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
+
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Unauthorized',
+        text: 'Please log in to post a blog.',
+      });
+      return;
+    }
 
     try {
-      const response = await axios.post(
-
-        'http://localhost:8000/account/blogs/',
+      await axios.post(
+        'http://127.0.0.1:8000/accounts/blogs/',
         formData,
         {
           headers: {
-            Authorization: `Token ${localStorage.getItem('authToken')}`,
+            Authorization: `Token ${token}`,
           },
         }
       );
 
-      setSuccess('Blog posted successfully!');
-      setFormData({ title: '', content: '' });
-    } catch (err) {
-      setError(err.response ? err.response.data.detail : 'Failed to post blog');
-    }
+      Swal.fire({
+        icon: 'success',
+        title: 'Blog Posted',
+        text: 'Your blog was successfully posted!',
+      });
 
+      navigate('/blogs')
+
+      setFormData({ title: '', content: '' }); 
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.response?.data?.detail || 'Failed to post the blog.',
+      });
+    }
   };
 
-  return <>
-    
-    <NavBar/>
+  return (
+    <>
+      <NavBar />
 
-    <div style={styles.container}>
+      <div style={styles.container}>
+        <div style={styles.formWrapper}>
+          <h2 style={styles.heading}>Post a New Blog</h2>
 
-      <div style={styles.formWrapper}>
+          <form onSubmit={handleSubmit} style={styles.form}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Title:</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              />
+            </div>
 
-        <h2 style={styles.heading}>Post a New Blog</h2>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Content:</label>
+              <textarea
+                name="content"
+                value={formData.content}
+                onChange={handleChange}
+                style={styles.textarea}
+                required
+              />
+            </div>
 
-        {error && <p style={styles.error}>{error}</p>}
-        {success && <p style={styles.success}>{success}</p>}
-
-        <form onSubmit={handleSubmit} style={styles.form}>
-
-          <div style={styles.formGroup}>
-
-            <label style={styles.label}>Title:</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              style={styles.input}
-              required
-            />
-          </div>
-          <div style={styles.formGroup}>
-
-            <label style={styles.label}>Content:</label>
-
-            <textarea
-              name="content"
-              value={formData.content}
-              onChange={handleChange}
-              style={styles.textarea}
-              required
-            />
-          </div>
-
-          <button type="submit" style={styles.button}>
-            Submit
-          </button>
-        </form>
+            <button
+              type="submit"
+              style={styles.button}
+              onMouseOver={(e) => (e.target.style.backgroundColor = styles.buttonHover.backgroundColor)}
+              onMouseOut={(e) => (e.target.style.backgroundColor = styles.button.backgroundColor)}
+            >
+              Submit
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-  
-  </>;
+    </>
+  );
 }
 
 const styles = {
-
   container: {
     display: 'flex',
     justifyContent: 'center',
@@ -98,8 +114,8 @@ const styles = {
   },
   formWrapper: {
     width: '100%',
-    maxWidth: '350px',
-    padding: '1rem',
+    maxWidth: '400px',
+    padding: '2rem',
     backgroundColor: '#fff',
     borderRadius: '10px',
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
@@ -107,22 +123,14 @@ const styles = {
   },
   heading: {
     fontSize: '1.8rem',
-    marginBottom: '1rem',
+    marginBottom: '1.5rem',
     color: '#333',
-  },
-  error: {
-    color: '#e74c3c',
-    marginBottom: '1rem',
-  },
-  success: {
-    color: '#2ecc71',
-    marginBottom: '1rem',
   },
   form: {
     width: '100%',
   },
   formGroup: {
-    marginBottom: '1rem',
+    marginBottom: '1.5rem',
     textAlign: 'left',
   },
   label: {
