@@ -1,10 +1,21 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css-file/navbar.css";
 import logo from "../images/sandsort-blog.png";
 
 export default function NavBar() {
+
+  const navigate= useNavigate();
+  const isLoggedIn= !!localStorage.getItem("authToken");
+
+  const handleLogout=()=>
+    {
+      localStorage.removeItem("authToken");
+      navigate("/login");
+    }
+
+
   return (
     <div className="navbar">
 
@@ -21,19 +32,28 @@ export default function NavBar() {
         <Link to="/" className="navItems">
           Home
         </Link>
-        <Link to="/blogs" className="navItems">
-          Blogs
-        </Link>
-        <Link to="/login" className="navItems">
-          Login
-        </Link>
-        <Link href="" className="navItems">
-          Logout
-        </Link>
-        <Link href="" className="navItems">
-          Register
-        </Link>
 
+        {!isLoggedIn ? (
+          <>
+            <Link to="/login" className="navItems">
+              Login
+            </Link>
+            <Link to="/register" className="navItems">
+              Register
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link to="/blogs" className="navItems">
+               Blogs
+            </Link>
+         
+            <Link to="/" className="navItems" onClick={handleLogout}>
+              Logout
+            </Link>
+            
+          </>
+        )}
       </div>
     </div>
   );
