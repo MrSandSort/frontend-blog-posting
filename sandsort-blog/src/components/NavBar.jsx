@@ -10,7 +10,7 @@ export default function NavBar() {
 
       <div className="Logo">
 
-        <Link to="Home">
+        <Link to="/">
           <img src={logo} alt="Logo" height={70} width={70}></img>
         </Link>
 
@@ -18,13 +18,13 @@ export default function NavBar() {
 
       <div className="navList">
 
-        <Link to="Home" className="navItems">
+        <Link to="/" className="navItems">
           Home
         </Link>
-        <Link href="" className="navItems">
+        <Link to="blogs/" className="navItems">
           Blogs
         </Link>
-        <Link href="" className="navItems">
+        <Link to="" className="navItems">
           Login
         </Link>
         <Link href="" className="navItems">

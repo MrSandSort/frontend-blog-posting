@@ -1,6 +1,5 @@
 import React from "react";
 import "../css-file/marqu.css";
-import { Button } from "bootstrap";
 import { Link } from "react-router-dom";
 
 
