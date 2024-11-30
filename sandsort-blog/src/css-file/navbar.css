@@ -4,15 +4,25 @@
 
 }
 
+body {
+    margin-top: 100px; 
+  }
+
 
 .Logo
 {
    padding-left: 1rem;
 }
 
+
+
 .navbar{
-    backface-visibility: visible;
-    background-color:rgb(245, 247, 248);
+    position: fixed;       
+    top: 0;                
+    width: 100%;           
+    z-index: 1000;       
+    background-color: #fff; 
+    box-shadow: 0 2px 5px rgba(4, 136, 169, 0.1); 
 }
 
 .navList 
@@ -26,9 +36,22 @@
 .navItems{
 text-decoration: none;
 color: black;
+font-weight: bold;
 
 }
 
 .navItems:hover {
     color: #007bff; 
   }
+
+
+.usernameDisplay {
+    padding-left:20px ;
+    padding-bottom: 20px;
+    font-weight: bold;
+    font-size: 0.85rem;  
+    color: #098583;  
+    text-align: center;
+    cursor: pointer;
+  }
+  

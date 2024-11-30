@@ -34,7 +34,7 @@ export default function Blog_Modal() {
               
             {
               headers:{
-                Authorization:`Bearer ${localStorage.getItem('authToken')}`
+                Authorization:`Bearer ${authToken}`
               }
             }
             );
@@ -64,8 +64,6 @@ export default function Blog_Modal() {
   return (
 
     <div>
-
-
       
     {blogs.length > 0 ? (
 
@@ -85,19 +83,19 @@ export default function Blog_Modal() {
         >
       
           <div className="blog-title" style={{ marginBottom: '0.5rem' }}>
-            <h4 style={{ margin: 0, fontSize: '1.5rem', color: '#333' }}>{blog.title}</h4>
-            <p
-              style={{
+           
+            <h3 style={{ margin: 0, textAlign:'center',fontSize: '1.5rem', color: '#333', fontFamily:'fantasy' }}>{blog.title}</h3>
+
+            <p style={{
                 margin: '0.5rem 0 0',
                 fontSize: '0.9rem',
                 color: '#888',
+                textAlign:'center'
               }}
             >
-            <strong>{blog.author}</strong> • {new Date(blog.created_at).toLocaleDateString()} • {blog.time_since_posted} 
+            <strong>{blog.author}</strong> • {new Date(blog.created_at).toLocaleDateString()}
             </p>
           </div>
-
-         
 
           <div
             className="blog-content"
@@ -105,7 +103,8 @@ export default function Blog_Modal() {
               color: '#555',
               lineHeight: '1.6',
               marginBottom: '1rem',
-              textAlign: 'justify',
+              textAlign:'justify',
+              
             }}
           >
             <p>{blog.content}</p>

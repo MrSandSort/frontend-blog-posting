@@ -1,12 +1,12 @@
 import React from 'react'
 import NavBar from '../components/NavBar'
-import Marq_el from '../components/Marq_el'
+import Marq from '../components/Marql'
 
 export default function Home() {
   return (
     <div>
        <NavBar/>
-       <Marq_el/>
+       <Marq/>
     </div>
   )
 }

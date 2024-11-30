@@ -1,28 +1,54 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
 import "../css-file/navbar.css";
 import logo from "../images/sandsort-blog.png";
+import axios from "axios";
 
 export default function NavBar() {
-
-  const [showLogoutModal, setShowLogoutModal]= useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [username, setUsername] = useState(null);
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("authToken");
-  
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     setShowLogoutModal(false);
+    setUsername(null);
     navigate("/login");
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          const response = await axios.get(
+            "http://127.0.0.1:8000/accounts/profile/",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setUsername(response.data.username);
+        }
+      } catch (error) {
+        console.log("Data is not fetched properly");
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchUserData();
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className="navbar">
       <div className="Logo">
         <Link to="/">
-          <img src={logo} alt="Logo" height={70} width={70}></img>
+          <img src={logo} alt="Logo" height={70} width={70} />
         </Link>
       </div>
 
@@ -33,7 +59,7 @@ export default function NavBar() {
         <Link to="/blogs" className="navItems">
           Blogs
         </Link>
-    
+
         {!isLoggedIn ? (
           <>
             <Link to="/login" className="navItems">
@@ -45,29 +71,46 @@ export default function NavBar() {
           </>
         ) : (
           <>
-            <Link to="#" className="navItems" onClick={()=>{setShowLogoutModal(true)}}>
+            <Link
+              to="#"
+              className="navItems"
+              onClick={() => {
+                setShowLogoutModal(true);
+              }}
+            >
               Logout
             </Link>
+
+            {isLoggedIn && username && (
+              <div className="usernameDisplay">
+                <p>Hi, {username}</p>
+              </div>
+            )}
           </>
+
         )}
       </div>
-       <Modal show={showLogoutModal} onHide={()=> setShowLogoutModal(false)} centered>
 
+      <Modal
+        show={showLogoutModal}
+        onHide={() => setShowLogoutModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
-
           <Modal.Title> </Modal.Title>
           <Modal.Body>Are you sure you want to log out?</Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={()=>setShowLogoutModal(false)}> Cancel </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setShowLogoutModal(false)}
+            >
+              Cancel
+            </Button>
             <Button variant="danger" onClick={handleLogout}>
-             Logout
-          </Button>
+              Logout
+            </Button>
           </Modal.Footer>
-
         </Modal.Header>
-
-
-
       </Modal>
     </div>
   );
