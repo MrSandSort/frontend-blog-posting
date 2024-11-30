@@ -10,6 +10,7 @@ export default function NavBar() {
   const [showLogoutModal, setShowLogoutModal]= useState(false);
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("authToken");
+  
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");

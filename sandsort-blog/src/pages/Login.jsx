@@ -22,9 +22,12 @@ export default function Login() {
         "http://127.0.0.1:8000/accounts/login/",
         formData
       );
-      const token = response.data.token;
-
+     
+      console.log(response)
+      const token = response.data.access;
       localStorage.setItem("authToken", token);
+      
+
       Swal.fire({
         icon: "success",
         title: "Login Successful!",

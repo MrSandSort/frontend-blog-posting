@@ -34,7 +34,7 @@ export default function Blog_Modal() {
               
             {
               headers:{
-                Authorization:`Token ${localStorage.getItem('authToken')}`
+                Authorization:`Bearer ${localStorage.getItem('authToken')}`
               }
             }
             );
@@ -59,7 +59,7 @@ export default function Blog_Modal() {
 
         fetchBlogs();
 
-    },[])
+    },[navigate])
 
   return (
 
