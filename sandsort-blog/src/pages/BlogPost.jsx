@@ -7,13 +7,18 @@ import { useNavigate } from 'react-router-dom';
 
 export default function BlogModal() {
 
-  const [formData, setFormData] = useState({ title: '', content: '' });
+  const [formData, setFormData] = useState({ title: '', content: '', image:null });
   const navigate= useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
+
+  const handleImageChange=(e)=>
+  {
+    setFormData((prevData)=>({...prevData, image:e.target.files[0]}));
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,13 +33,22 @@ export default function BlogModal() {
       return;
     }
 
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('content', formData.content);
+    if (formData.image) {
+      data.append('image', formData.image);
+    }
+
+
     try {
       await axios.post(
         'http://127.0.0.1:8000/accounts/blogs/',
         formData,
         {
           headers: {
-            Authorization: `Token ${token}`,
+           'Authorization': `Token ${token}`,
+           'Content-Type': 'multipart/form-data',
           },
         }
       );
@@ -47,7 +61,7 @@ export default function BlogModal() {
 
       navigate('/blogs')
 
-      setFormData({ title: '', content: '' }); 
+      setFormData({ title: '', content: '' , image:null}); 
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -86,6 +100,17 @@ export default function BlogModal() {
                 onChange={handleChange}
                 style={styles.textarea}
                 required
+              />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Image:</label>
+              <input
+                type="file"
+                name="image"
+                onChange={handleImageChange}
+                style={styles.input}
+                accept="image/*"
               />
             </div>
 

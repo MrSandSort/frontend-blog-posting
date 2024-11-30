@@ -1,17 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { FaHeart, FaComment } from 'react-icons/fa'; 
 import axios from 'axios';
+import Swal from "sweetalert2";
+import { useNavigate } from 'react-router-dom';
+
 
 
 export default function Blog_Modal() {
 
   const [blogs, setBlogs]= useState([]);
-  const [error, setError]= useState(null);
+  const navigate= useNavigate();
+
 
   useEffect(()=>
-    {
+  {
       const fetchBlogs= async ()=>
         {
+          const authToken = localStorage.getItem("authToken");
+
+          if (!authToken) {
+            Swal.fire({
+              icon: "warning",
+              title: "Unauthorized",
+              text: "Please log in to view blogs.",
+            }).then(() => {
+             navigate('/login'); 
+            });
+            return;
+            
+          }
           try{
             const response= await axios.get('http://127.0.0.1:8000/accounts/blogs/',
               
@@ -27,7 +44,15 @@ export default function Blog_Modal() {
 
           }catch(err)
           {
-            setError(err.response ? err.response.data.detail: 'Failed to fetch blogs')
+            const errorMessage = err.response
+          ? err.response.data.detail
+          : "Failed to fetch blogs";
+             Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+              })
+
           }
 
         };
@@ -39,6 +64,8 @@ export default function Blog_Modal() {
   return (
 
     <div>
+
+
       
     {blogs.length > 0 ? (
 
@@ -51,11 +78,12 @@ export default function Blog_Modal() {
             border: '2px solid #ccc',
             borderRadius: '10px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            margin: '1rem',
+            margin: '1rem auto ',
             maxWidth: '65rem',
             backgroundColor: 'rgb(245, 247, 248)',
           }}
         >
+      
           <div className="blog-title" style={{ marginBottom: '0.5rem' }}>
             <h4 style={{ margin: 0, fontSize: '1.5rem', color: '#333' }}>{blog.title}</h4>
             <p
@@ -65,9 +93,11 @@ export default function Blog_Modal() {
                 color: '#888',
               }}
             >
-              <strong>{blog.author}</strong> • {new Date(blog.created_at).toLocaleDateString()}
+            <strong>{blog.author}</strong> • {new Date(blog.created_at).toLocaleDateString()} • {blog.time_since_posted} 
             </p>
           </div>
+
+         
 
           <div
             className="blog-content"
@@ -94,12 +124,12 @@ export default function Blog_Modal() {
             }}
           >
             <div className="likes" style={{ display: 'flex', alignItems: 'center' }}>
-              <FaHeart style={{ marginRight: '0.3rem', color: '#e74c3c' }} />
+              <FaHeart style={{ marginRight: '0.3rem', color: '#FF0A0AFF' }} />
               <span>{blog.likes} Likes</span>
             </div>
 
             <div className="comments" style={{ display: 'flex', alignItems: 'center' }}>
-              <FaComment style={{ marginRight: '0.3rem', color: '#3498db' }} />
+              <FaComment style={{ marginRight: '0.3rem', color: '#1C55D8FF' }} />
               <span>{blog.comments_count} Comments</span>
             </div>
           </div>
