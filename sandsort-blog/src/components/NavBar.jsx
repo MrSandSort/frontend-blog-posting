@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Dropdown } from "react-bootstrap";
 import "../css-file/navbar.css";
 import logo from "../images/sandsort-blog.png";
+import { CgProfile } from "react-icons/cg";
 import axios from "axios";
 
 export default function NavBar() {
@@ -71,23 +72,43 @@ export default function NavBar() {
           </>
         ) : (
           <>
-            <Link
-              to="#"
-              className="navItems"
-              onClick={() => {
-                setShowLogoutModal(true);
-              }}
-            >
-              Logout
-            </Link>
-
-            {isLoggedIn && username && (
-              <div className="usernameDisplay">
+            <div className="usernameDisplay">
                 <p>Hi, {username}</p>
-              </div>
-            )}
-          </>
+            </div>
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="light"
+                id="profile-dropdown"
+                style={{
+                  border: "none",
+                  backgroundColor: "transparent",
+                  padding: "0",
+                }}
+              >
+                <CgProfile size={28} />
+              </Dropdown.Toggle>
 
+              <Dropdown.Menu>
+                <Dropdown.Item as={Link} to="/view-profile">
+                  View Profile
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/edit-profile">
+                  Edit Profile
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/user-blogs">
+                  Your Blogs
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item
+                  onClick={() => setShowLogoutModal(true)}
+                  style={{ color: "red" }}
+                >
+                  Logout
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+           
+          </>
         )}
       </div>
 

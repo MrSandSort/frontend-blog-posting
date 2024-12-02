@@ -52,6 +52,8 @@ font-weight: bold;
     font-size: 0.85rem;  
     color: #098583;  
     text-align: center;
-    cursor: pointer;
   }
   
+.edit-prof{
+    padding: 2rem;
+}

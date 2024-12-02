@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "../css-file/register.css"
 import NavBar from "../components/NavBar";
+import { useNavigate } from "react-router-dom";
 
 
 const RegisterForm = () => {
@@ -11,6 +12,8 @@ const RegisterForm = () => {
     email: "",
     password: "",
   });
+  
+  const navigate= useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,6 +32,11 @@ const RegisterForm = () => {
         title: "Registration Successful",
         text: "You have been registered successfully!",
       });
+
+      setTimeout(() => {
+        navigate("/"); 
+      }, 2000);
+
 
       setFormData({ username: "", email: "", password: "" });
 
