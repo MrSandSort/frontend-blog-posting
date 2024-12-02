@@ -7,6 +7,8 @@ import Login from './pages/Login';
 import RegisterForm from './pages/Register';
 import UserProfile from './pages/userProfile';
 import ViewProfile from './pages/ViewProfile';
+import YourBlog from './pages/YourBlog';
+import EditBlog from './pages/EditBlog';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path= "register" element={<RegisterForm/>}></Route>
         <Route path="edit-profile" element={<UserProfile/>}></Route>
         <Route path="view-profile" element={<ViewProfile/>}></Route>
+        <Route path="user-blogs" element={<YourBlog/>}></Route>
+        <Route path="/edit/:id" element={<EditBlog/>} />
       </Routes>
     </Router>
   );
