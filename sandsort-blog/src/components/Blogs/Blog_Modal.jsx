@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { FaHeart, FaComment } from "react-icons/fa";
-import { LuLoader2 } from "react-icons/lu"; // Loader icon
+import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
+import { LuLoader2 } from "react-icons/lu";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 export default function Blog_Modal() {
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -27,33 +26,77 @@ export default function Blog_Modal() {
       }
 
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/accounts/blogs/",
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-
+        const response = await axios.get("http://127.0.0.1:8000/accounts/blogs/", {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        
+        console.log(response.data)
         setBlogs(response.data);
-
       } catch (err) {
-        const errorMessage = err.response
-          ? err.response.data.detail
-          : "Failed to fetch blogs";
+        console.error("Error fetching blogs:", err);
+        const errorMessage = err.response ? err.response.data.detail : "Failed to fetch blogs";
         Swal.fire({
           icon: "error",
           title: "Error",
           text: errorMessage,
         });
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
     fetchBlogs();
   }, [navigate]);
+
+  
+  const handleLike = async (postId) => {
+    const authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+      Swal.fire({
+        icon: "warning",
+        title: "Unauthorized",
+        text: "Please log in to like or unlike posts.",
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/accounts/blogs/${postId}/like/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+     console.log(response.data)
+      setBlogs((prevBlogs) =>
+        prevBlogs.map((blog) =>
+          blog.id === postId
+            ? {
+                ...blog,
+                liked_by_user: response.data.liked_by_user,  
+                likes_count: response.data.likes_count,  
+              }
+            : blog
+        )
+      );
+    } catch (err) {
+      const errorMessage = err.response
+        ? err.response.data.detail
+        : "Failed to like/unlike the post";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+  };
 
   return (
     <div>
@@ -118,7 +161,6 @@ export default function Blog_Modal() {
                   month: "long",
                   day: "numeric",
                 })}
-                
               </p>
             </div>
 
@@ -150,10 +192,28 @@ export default function Blog_Modal() {
                 className="likes"
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <FaHeart
-                  style={{ marginRight: "0.3rem", color: "#FF0A0AFF" }}
-                />
-                <span>{blog.likes} Likes</span>
+                {blog.liked_by_user ? (
+                  <FaHeart
+                    style={{
+                      marginRight: "0.3rem",
+                      color: "#FF0A0AFF",  
+                      cursor: "pointer",
+                      transition: "color 0.3s ease",  
+                    }}
+                    onClick={() => handleLike(blog.id)}
+                  />
+                ) : (
+                  <FaRegHeart
+                    style={{
+                      marginRight: "0.3rem",
+                      color: "#888",  
+                      cursor: "pointer",
+                      transition: "color 0.3s ease", 
+                    }}
+                    onClick={() => handleLike(blog.id)}
+                  />
+                )}
+                <span>{blog.likes_count || 0} Likes</span>
               </div>
 
               <div
@@ -163,7 +223,7 @@ export default function Blog_Modal() {
                 <FaComment
                   style={{ marginRight: "0.3rem", color: "#1C55D8FF" }}
                 />
-                <span>{blog.comments_count} Comments</span>
+                <span>{blog.comments_count || 0} Comments</span>
               </div>
             </div>
           </div>
