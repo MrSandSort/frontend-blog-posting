@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
+import { FaHeart, FaEdit, FaTrash, FaRegHeart } from "react-icons/fa";
 import { LuLoader2 } from "react-icons/lu";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -9,6 +9,7 @@ export default function Blog_Modal() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -26,17 +27,21 @@ export default function Blog_Modal() {
       }
 
       try {
-        const response = await axios.get("http://127.0.0.1:8000/accounts/blogs/", {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-        
-        console.log(response.data)
+        const response = await axios.get(
+          "http://127.0.0.1:8000/accounts/blogs/",
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
         setBlogs(response.data);
       } catch (err) {
         console.error("Error fetching blogs:", err);
-        const errorMessage = err.response ? err.response.data.detail : "Failed to fetch blogs";
+        const errorMessage = err.response
+          ? err.response.data.detail
+          : "Failed to fetch blogs";
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -50,7 +55,111 @@ export default function Blog_Modal() {
     fetchBlogs();
   }, [navigate]);
 
-  
+  const handleEditComment = async (blogId, commentId, newContent) => {
+    const authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+      Swal.fire({
+        icon: "warning",
+        title: "Unauthorized",
+        text: "Please log in to edit comments.",
+      });
+      return;
+    }
+
+    try {
+      await axios.put(
+        `http://127.0.0.1:8000/accounts/comments/${commentId}/`,
+        { content: newContent },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      setBlogs((prevBlogs) =>
+        prevBlogs.map((blog) =>
+          blog.id === blogId
+            ? {
+                ...blog,
+                comments: blog.comments.map((comment) =>
+                  comment.id === commentId
+                    ? { ...comment, content: newContent }
+                    : comment
+                ),
+              }
+            : blog
+        )
+      );
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Comment updated successfully!",
+      });
+    } catch (err) {
+      const errorMessage = err.response
+        ? err.response.data.detail
+        : "Failed to update the comment";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+  };
+
+  const handleDeleteComment = async (blogId, commentId) => {
+    const authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+      Swal.fire({
+        icon: "warning",
+        title: "Unauthorized",
+        text: "Please log in to delete comments.",
+      });
+      return;
+    }
+
+    try {
+      await axios.delete(
+        `http://127.0.0.1:8000/accounts/comments/${commentId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      setBlogs((prevBlogs) =>
+        prevBlogs.map((blog) =>
+          blog.id === blogId
+            ? {
+                ...blog,
+                comments: blog.comments.filter(
+                  (comment) => comment.id !== commentId
+                ),
+              }
+            : blog
+        )
+      );
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Comment deleted successfully!",
+      });
+    } catch (err) {
+      const errorMessage = err.response
+        ? err.response.data.detail
+        : "Failed to delete the comment";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
+    }
+  };
+
   const handleLike = async (postId) => {
     const authToken = localStorage.getItem("authToken");
 
@@ -74,14 +183,13 @@ export default function Blog_Modal() {
         }
       );
 
-     console.log(response.data)
       setBlogs((prevBlogs) =>
         prevBlogs.map((blog) =>
           blog.id === postId
             ? {
                 ...blog,
-                liked_by_user: response.data.liked_by_user,  
-                likes_count: response.data.likes_count,  
+                liked_by_user: response.data.liked_by_user,
+                likes_count: response.data.likes_count,
               }
             : blog
         )
@@ -196,9 +304,9 @@ export default function Blog_Modal() {
                   <FaHeart
                     style={{
                       marginRight: "0.3rem",
-                      color: "#FF0A0AFF",  
+                      color: "#FF0A0AFF",
                       cursor: "pointer",
-                      transition: "color 0.3s ease",  
+                      transition: "color 0.3s ease",
                     }}
                     onClick={() => handleLike(blog.id)}
                   />
@@ -206,24 +314,194 @@ export default function Blog_Modal() {
                   <FaRegHeart
                     style={{
                       marginRight: "0.3rem",
-                      color: "#888",  
+                      color: "#888",
                       cursor: "pointer",
-                      transition: "color 0.3s ease", 
+                      transition: "color 0.3s ease",
                     }}
                     onClick={() => handleLike(blog.id)}
                   />
                 )}
                 <span>{blog.likes_count || 0} Likes</span>
               </div>
+            </div>
 
-              <div
-                className="comments"
-                style={{ display: "flex", alignItems: "center" }}
+            <div
+              className="comments"
+              style={{
+                marginTop: "1rem",
+                borderTop: "1px solid #eee",
+                paddingTop: "0.5rem",
+              }}
+            >
+              <h4
+                style={{
+                  fontSize: "1rem",
+                  color: "#333",
+                  fontFamily: "Arial, sans-serif",
+                }}
               >
-                <FaComment
-                  style={{ marginRight: "0.3rem", color: "#1C55D8FF" }}
-                />
-                <span>{blog.comments_count || 0} Comments</span>
+                Comment: {blog.comments.length}
+              </h4>
+
+              {blog.comments && blog.comments.length > 0 ? (
+                <div
+                  style={{
+                    maxHeight: "150px",
+                    overflowY: "auto",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  {blog.comments.map((comment) => (
+                    <div
+                      key={comment.id}
+                      style={{
+                        marginBottom: "0.5rem",
+                        padding: "0.5rem",
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: 0,
+                          fontWeight: "bold",
+                          color: "#444",
+                        }}
+                      >
+                        {comment.author}
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginBottom: "0.5rem",
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: "0.2rem 0 0",
+                            color: "#555",
+                            fontSize: "0.9rem",
+                            flex: 1,
+                          }}
+                        >
+                          {comment.content}
+                        </p>
+
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          <FaEdit
+                            style={{ cursor: "pointer", color: "#4CAF50" }}
+                            onClick={() =>
+                              handleEditComment(
+                                blog.id,
+                                comment.id,
+                                prompt("Edit Comment:", comment.content)
+                              )
+                            }
+                          />
+                          <FaTrash
+                            style={{ cursor: "pointer", color: "#CC0F0F" }}
+                            onClick={() =>
+                              handleDeleteComment(blog.id, comment.id)
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: "#888", fontSize: "0.9rem" }}>
+                  No comments yet.
+                </p>
+              )}
+
+              <div style={{ marginTop: "0.5rem" }}>
+                <textarea
+                  placeholder="Write a comment..."
+                  rows="2"
+                  style={{
+                    width: "100%",
+                    padding: "0.5rem",
+                    borderRadius: "5px",
+                    border: "1px solid #ddd",
+                    resize: "none",
+                  }}
+                  value={blog.newComment || ""}
+                  onChange={(e) =>
+                    setBlogs((prevBlogs) =>
+                      prevBlogs.map((b) =>
+                        b.id === blog.id
+                          ? { ...b, newComment: e.target.value }
+                          : b
+                      )
+                    )
+                  }
+                ></textarea>
+                <button
+                  onClick={async () => {
+                    const authToken = localStorage.getItem("authToken");
+
+                    if (!authToken) {
+                      Swal.fire({
+                        icon: "warning",
+                        title: "Unauthorized",
+                        text: "Please log in to post comments.",
+                      });
+                      return;
+                    }
+
+                    try {
+                      const response = await axios.post(
+                        `http://127.0.0.1:8000/accounts/blogs/${blog.id}/comments/`,
+                        { content: blog.newComment },
+                        {
+                          headers: {
+                            Authorization: `Bearer ${authToken}`,
+                          },
+                        }
+                      );
+
+                      setBlogs((prevBlogs) =>
+                        prevBlogs.map((b) =>
+                          b.id === blog.id
+                            ? {
+                                ...b,
+                                comments: [...b.comments, response.data],
+                                newComment: "",
+                              }
+                            : b
+                        )
+                      );
+                      Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: "Comment added successfully!",
+                      });
+                    } catch (err) {
+                      const errorMessage = err.response
+                        ? err.response.data.detail
+                        : "Failed to post the comment";
+                      Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: errorMessage,
+                      });
+                    }
+                  }}
+                  style={{
+                    marginTop: "0.5rem",
+                    padding: "0.5rem 1rem",
+                    border: "none",
+                    borderRadius: "5px",
+                    backgroundColor: "#007BFF",
+                    color: "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  Add Comment
+                </button>
               </div>
             </div>
           </div>
